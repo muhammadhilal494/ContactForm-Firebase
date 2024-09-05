@@ -3,12 +3,17 @@ import {db} from './firebaseConfig'
 import { collection, addDoc } from "firebase/firestore";
 import React, { useState } from 'react'
 
-async function addDataToFireStore(name: string, email: string, message: string) {
+async function addDataToFireStore(name: string, email: string, message: string, phone: number,
+   buildingName: string, location: string, inputCode: string) {
   try {
     const docRef = await addDoc(collection(db, "ContactForm"), {
       name: name,
       email: email,
-      message: message
+      message: message,
+      phone: phone,
+      buildingName: buildingName,
+      location: location,
+      inputCode: inputCode,
     });
     console.log("Document written with ID: ", docRef.id);
     return true;
@@ -22,14 +27,29 @@ export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [phone, setPhone] = useState("");
+  const [buildingName, setBuildingName] = useState("");
+  const [location, setLocation] = useState("");
+  const [inputCode, setInputCode] = useState("");
 
   const handleSubmit = async (e:any) => {
     e.preventDefault();
-    const added = await addDataToFireStore(name, email, message);
+     
+    // Convert phone to a number, with validation
+    const phoneNumber = parseFloat(phone);
+    if (isNaN(phoneNumber)) {
+      alert("Please enter a valid phone number.");
+      return;
+    }
+    const added = await addDataToFireStore(name, email, message, phoneNumber, buildingName, location, inputCode);
     if (added) {
       setName("");
       setEmail("");
       setMessage("");
+      setPhone("")
+      setBuildingName("")
+      setLocation("")
+      setInputCode("")
 
       alert("Data added to firestore DB!");
     }
@@ -64,6 +84,42 @@ export default function Home() {
           />
         </div>
         <div className="mb-4">
+          <label htmlFor="phone" className="block text-gray-700 font-bold mb-2">
+            Phone:
+          </label>
+          <input
+            type="number"
+            id="phone"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="ApartmentNo/BuildingName" className="block text-gray-700 font-bold mb-2">
+            AparmentNo/BuildingName:
+          </label>
+          <input
+            type="text"
+            id="ApartmentNo/BuildingName"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+            value={buildingName}
+            onChange={(e) => setBuildingName(e.target.value)}
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="location" className="block text-gray-700 font-bold mb-2">
+            location:
+          </label>
+          <input
+            type="text"
+            id="location"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+          />
+        </div>
+        <div className="mb-4">
           <label htmlFor="message" className="block text-gray-700 font-bold mb-2">
             Message:
           </label>
@@ -74,6 +130,18 @@ export default function Home() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           ></textarea>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="inputCode" className="block text-gray-700 font-bold mb-2">
+            Input Code:
+          </label>
+          <input
+            type="text"
+            id="inputCode"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+            value={inputCode}
+            onChange={(e) => setInputCode(e.target.value)}
+          />
         </div>
         <div className="text-center">
           <button type="submit"
